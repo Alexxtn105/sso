@@ -94,3 +94,13 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (
 
 	return id, nil
 }
+
+
+func (a *Auth) Login (
+	ctx context.Context,
+	email string,		
+	password string, 	// ВНИМАНИЕ!!! Пароль в чистом виде, аккуратнее с логами!!!
+	appID,				//ID приложения, в котором логинится пользователь
+){
+	
+}
