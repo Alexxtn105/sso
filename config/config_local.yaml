@@ -1,0 +1,7 @@
+#config/config_local.yaml
+
+env: "local"   #текущее окружение. Может быть: local, dev, prod
+storage_path: "./storage/sso.db"
+grpc:
+  port: 44044
+  timeout: 10h
