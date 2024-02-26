@@ -5,6 +5,7 @@ go 1.21.6
 require (
 	github.com/Alexxtn105/protos v0.0.0-20240225145233-c43e61ee55b4 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.5.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
