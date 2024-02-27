@@ -2,14 +2,18 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	//"google.golang.org/genproto/googleapis/storage/v1"
 
 	"grpc-service-ref/internal/domain/models"
+	"grpc-service-ref/internal/lib/jwt"
 	"grpc-service-ref/internal/lib/logger/sl"
+	"grpc-service-ref/internal/storage"
 )
 
 /*
@@ -95,12 +99,60 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (
 	return id, nil
 }
 
-
-func (a *Auth) Login (
+// Login checks if user given credentials exists in the system and returns access token
+// If user exists, but password is incorrect, returns error
+// if user doesn't exist, returns error
+// Текущая реализация метода имеет одну критичную дыру в безопасности — он не защищен от брутфорса (перебора паролей)
+func (a *Auth) Login(
 	ctx context.Context,
-	email string,		
-	password string, 	// ВНИМАНИЕ!!! Пароль в чистом виде, аккуратнее с логами!!!
-	appID,				//ID приложения, в котором логинится пользователь
-){
-	
+	email string,
+	password string, // ВНИМАНИЕ!!! Пароль в чистом виде, аккуратнее с логами!!!
+	appID int, // ID приложения, в котором логинится пользователь
+) (string, error) {
+	const op = "Auth.Login"
+
+	log := a.log.With(
+		slog.String("op", op),
+		slog.String("username", email),
+		//password либо не логируем, либо логируем в замаскированном виде
+	)
+
+	log.Info("attempting to login user")
+
+	//Достаем пользователя из БД
+	user, err := a.usrProvider.User(ctx, email)
+	if err != nil {
+		if errors.Is(err, storage.ErrUserNotFound) {
+			a.log.Warn("user not found", sl.Err(err))
+			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		}
+
+		a.log.Error("failed to get user", sl.Err(err))
+
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	//провреяем корректность текущего пароля
+	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(password)); err != nil {
+		a.log.Info("invalid credentials", sl.Err(err))
+	}
+
+	//получаем информацию о приложении
+	app, err := a.appProvider.App(ctx, appID)
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("user logged in successfully")
+
+	//создаем токен авторизации
+	token, err := jwt.NewToken(user, app, a.tokenTTL)
+
+	if err != nil {
+		a.log.Error("failed to generate token", sl.Err(err))
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	return token, nil
+
 }

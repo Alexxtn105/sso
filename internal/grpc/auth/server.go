@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"grpc-service-ref/internal/storage"
 
 	// Подключаем сгенерированный код
 	ssov1 "github.com/Alexxtn105/protos/gen/go/sso"
