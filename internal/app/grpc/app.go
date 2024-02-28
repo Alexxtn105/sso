@@ -19,7 +19,7 @@ type App struct {
 }
 
 // New creates new gRPC server app.
-// Для конструктора использхуем библиотеку grpc-ecosystem/go-grpc-middleware
+// Для конструктора используем библиотеку grpc-ecosystem/go-grpc-middleware
 // содержащую готовые реализации некоторых полезных интерсепторов
 // Установка:
 // go get github.com/grpc-ecosystem/go-grpc-middleware/v2@v2.0.0
