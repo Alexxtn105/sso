@@ -14,6 +14,7 @@ import (
 
 type App struct {
 	GRPCServer *grpcapp.App
+	Storage    *sqlite.Storage //Added by Alexx
 }
 
 func New(
@@ -40,5 +41,6 @@ func New(
 
 	return &App{
 		GRPCServer: grpcApp,
+		Storage:    storage,
 	}
 }

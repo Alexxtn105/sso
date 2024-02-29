@@ -10,13 +10,14 @@ import (
 
 // NewToken creates new JWT token for given user app
 func NewToken(user models.User, app models.App, duration time.Duration) (string, error) {
-	token := jwt.New(jwt.SigningMethodPS256.SigningMethodRSA)
-
+	//token := jwt.New(jwt.SigningMethodPS256.SigningMethodRSA)
+	token := jwt.New(jwt.SigningMethodHS256)
 	//добавляем в токен всю необходимую информацию
 	claims := token.Claims.(jwt.MapClaims) //утверждение типа интерфейса. Проверямый тип - jwt.MapClaims, значение token.Claims. Это что-то типа преобразования типа
 	claims["uid"] = user.ID
 	claims["email"] = user.Email
-	//В ней мы задаём срок действия (TTL) токена в виде конкретной временной метки, до которой он будет считаться валидным. После этого дедлайна токен будет считаться "протухшим", на стороне клиента мы его не будем принимать.
+	//В ней мы задаём срок действия (TTL) токена в виде конкретной временной метки, до которой он будет считаться валидным.
+	//После этого дедлайна токен будет считаться "протухшим", на стороне клиента мы его не будем принимать.
 	claims["exp"] = time.Now().Add(duration).Unix()
 	claims["app_id"] = app.ID
 

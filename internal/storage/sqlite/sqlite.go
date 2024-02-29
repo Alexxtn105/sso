@@ -124,3 +124,14 @@ func (s *Storage) App(ctx context.Context, id int) (models.App, error) {
 
 	return app, nil
 }
+
+// Added by Alexx - Закрытие БД (аналогично GracefulStop для gRPC)
+func (s *Storage) Close() error {
+	const op = "storage.sqlite.Close"
+	//s.Log.With(slog.String("op", op)).Info("stopping gRPC server", slog.Int("port", a.port))
+	err := s.db.Close()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	return nil
+}
