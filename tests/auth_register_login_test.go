@@ -40,6 +40,7 @@ func TestRegisterLogin_Login_HappyPath(t *testing.T) {
 		Email:    email,
 		Password: pass,
 	})
+
 	// Это вспомогательный запрос, поэтому делаем лишь минимальные проверки
 	require.NoError(t, err)
 	assert.NotEmpty(t, respReg.GetUserId())

@@ -124,7 +124,10 @@ func New(log *slog.Logger, authService authgrpc.Auth, port int) *App {
 func InterceptorLogger(l *slog.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
 		// TODO: САМОСТОЯТЕЛЬНО Замаскировать пароли в логах!!!
-		// Потому что это потенциальная джыра в безопасности!!!
+		// Потому что это потенциальная дыра в безопасности!!!
+		// Надо что-то сделать с fields!!!
+		//	l.Log(ctx, slog.Level(lvl), msg, fields...)
+
 		l.Log(ctx, slog.Level(lvl), msg, fields...)
 	})
 }

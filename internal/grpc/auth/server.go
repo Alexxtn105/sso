@@ -10,7 +10,6 @@ import (
 	// Подключаем сгенерированный код
 	ssov1 "github.com/Alexxtn105/protos/gen/go/sso"
 
-	//"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -61,15 +60,15 @@ func (s *serverAPI) Login(
 	//К примеру, если не подошел пароль или мы не нашли пользователя в БД, это — codes.InvalidArgument,
 	//если же БД вернула неожиданную ошибку, это уже codes.Internal.
 	if in.Email == "" {
-		return nil, status.Error(codes.InvalidArgument, "email is requred")
+		return nil, status.Error(codes.InvalidArgument, "email is required")
 	}
 
 	if in.Password == "" {
-		return nil, status.Error(codes.InvalidArgument, "password is requred")
+		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
 
 	if in.GetAppId() == 0 {
-		return nil, status.Error(codes.InvalidArgument, "app_id is requred")
+		return nil, status.Error(codes.InvalidArgument, "app_id is required")
 	}
 
 	token, err := s.auth.Login(ctx, in.GetEmail(), in.GetPassword(), int(in.GetAppId()))

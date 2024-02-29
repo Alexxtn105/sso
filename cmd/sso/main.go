@@ -28,10 +28,10 @@ func main() {
 	log := setupLogger(cfg.Env)
 	fmt.Println("Логгер загружен:\n", log)
 
-	// TODO инициализировать приложение (app)
+	// инициализируем приложение (app)
 	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
 
-	// TODO запустить gRPC-сервер приложения (вариант без GracefulStop)
+	// ВАРИАНТ ЗАПУСКА 1: запустить gRPC-сервер приложения (вариант без GracefulStop)
 	//application.GRPCServer.MustRun()
 
 	// !!!
@@ -42,7 +42,7 @@ func main() {
 	//
 	// application.MustRun()
 
-	//запускаем сервер как горутину для дальнейшего GracefulStop
+	// ВАРИАНТ ЗАПУСКА 2: запускаем сервер как горутину для дальнейшего GracefulStop
 	go func() {
 		application.GRPCServer.MustRun()
 	}()
@@ -56,9 +56,6 @@ func main() {
 	application.GRPCServer.Stop() // Assuming GRPCServer has Stop() method for graceful shutdown
 	log.Info("Gracefully stopped")
 
-	application.Storage.Close()
-	log.Info("Storage closed")
-
 	// TODO: Далее предлагаю вам самостоятельно написать
 	// аналогичный метод Stop() для sqlite-реализации Storage.
 	// Там это делается тоже одной строчкой:
@@ -67,6 +64,10 @@ func main() {
 	// в структуру App основного приложения (internal/app/app.go).
 	// При желании, можете обернуть хранилище
 	// в отдельное приложение StorageApp — это хороший подход.
+	// by Alexx: Сделано самостоятельно: закрываем БД
+	application.Storage.Close()
+	log.Info("Storage closed")
+
 }
 
 // настройка логгера

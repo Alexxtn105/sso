@@ -53,6 +53,7 @@ func New(t *testing.T) (context.Context, *Suite) {
 
 	// Читаем конфиг из файла
 	cfg := config.MustLoadPath(configPath())
+
 	// Основной родительский контекст
 	ctx, cancelCtx := context.WithTimeout(context.Background(), cfg.GRPC.Timeout)
 

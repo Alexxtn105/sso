@@ -107,7 +107,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (
 // Login checks if user given credentials exists in the system and returns access token
 // If user exists, but password is incorrect, returns error
 // if user doesn't exist, returns error
-// Текущая реализация метода имеет одну критичную дыру в безопасности — он не защищен от брутфорса (перебора паролей)
+// ВНИМАНИЕ!!! Текущая реализация метода имеет одну критичную дыру в безопасности — он не защищен от брутфорса (перебора паролей)
 func (a *Auth) Login(
 	ctx context.Context,
 	email string,
@@ -119,7 +119,8 @@ func (a *Auth) Login(
 	log := a.log.With(
 		slog.String("op", op),
 		slog.String("username", email),
-		//password либо не логируем, либо логируем в замаскированном виде
+		slog.String("password", "********"), //password либо не логируем, либо логируем в замаскированном виде
+
 	)
 
 	log.Info("attempting to login user")
