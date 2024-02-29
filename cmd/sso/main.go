@@ -1,11 +1,14 @@
 // `cmd/sso/main.go`
+// точка входа в приложение
 package main
 
 import (
 	"fmt"
-	"grpc-service-ref/internal/config"
 	"log/slog"
 	"os"
+
+	"grpc-service-ref/internal/app"
+	"grpc-service-ref/internal/config"
 )
 
 const (
@@ -24,8 +27,19 @@ func main() {
 	fmt.Println("Логгер загружен:\n", log)
 
 	// TODO инициализировать приложение (app)
+	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
 
 	// TODO запустить gRPC-сервер приложения
+	application.GRPCServer.MustRun()
+
+	// !!!
+	// Вместо строчки application.GRPCServer.MustRun()
+	// можете научить своё основное приложение автоматически запускать все внутренние,
+	// а не дёргать запуск внутренних в main().
+	// То есть, выглядеть это будет так:
+	//
+	// application.MustRun()
+
 }
 
 // настройка логгера

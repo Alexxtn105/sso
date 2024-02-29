@@ -24,6 +24,10 @@ type UserStorage interface {
 }
 */
 
+var (
+	ErrInvalidCredentials = errors.New("invalid credentials")
+)
+
 // Интерфейс сохранения пользователя
 type UserSaver interface {
 	SaveUser(

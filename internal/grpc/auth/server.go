@@ -4,6 +4,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"grpc-service-ref/internal/services/auth"
 	"grpc-service-ref/internal/storage"
 
 	// Подключаем сгенерированный код
