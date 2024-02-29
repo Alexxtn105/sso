@@ -10,7 +10,6 @@ import (
 
 // NewToken creates new JWT token for given user app
 func NewToken(user models.User, app models.App, duration time.Duration) (string, error) {
-	//token := jwt.New(jwt.SigningMethodPS256.SigningMethodRSA)
 	token := jwt.New(jwt.SigningMethodHS256)
 	//добавляем в токен всю необходимую информацию
 	claims := token.Claims.(jwt.MapClaims) //утверждение типа интерфейса. Проверямый тип - jwt.MapClaims, значение token.Claims. Это что-то типа преобразования типа
