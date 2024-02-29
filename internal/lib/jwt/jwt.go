@@ -1,3 +1,4 @@
+// internal/lib/jwt/jwt.go
 package jwt
 
 import (

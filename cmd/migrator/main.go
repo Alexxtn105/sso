@@ -1,3 +1,4 @@
+// cmd/migrator/main.go
 package main
 
 import (
@@ -12,6 +13,9 @@ import (
 	// Драйвер для получения миграций из файлов
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
+
+// Для работы с SQLite его можно скачать:
+// go get github.com/mattn/go-sqlite3@v1.14.16
 
 // Вспомогательная утилита миграции БД
 // У выбранной нами библиотеки для миграций следующий формат нейминга миграций:
@@ -29,7 +33,7 @@ import (
 func main() {
 	var storagePath, migrationsPath, migrationsTable string
 
-	//получаем необходимые значения флагов запуска
+	//получаем необходимые значения флагов запуска (аргументы командной строки)
 	//путь до файла БД
 	// Его достаточно, т.к. мы используем SQLite, други креды не нужны
 	flag.StringVar(&storagePath, "storage-path", "", "path to storage")
@@ -57,10 +61,10 @@ func main() {
 	}
 
 	// Создаем объект мигратора, передав креды нашей БД
-	//здесь вынесли нейминг таблицы для миграций в отдельный флаг
-	//с помощью параметра ?x-migrations-table=%s.
-	//Обычно это не обязательно, но я буду хранить отдельный набор миграций для тестов,
-	//и информация о них будет храниться в отдельной таблице. Но об этом в разделе про тестирование.
+	// здесь вынесли нейминг таблицы для миграций в отдельный флаг
+	// с помощью параметра ?x-migrations-table=%s.
+	// Обычно это не обязательно, но я буду хранить отдельный набор миграций для тестов,
+	// и информация о них будет храниться в отдельной таблице. Но об этом в разделе про тестирование.
 	m, err := migrate.New(
 		"file://"+migrationsPath,
 		fmt.Sprintf("sqlite3://%s?x-migrations-table=%s", storagePath, migrationsTable),
@@ -73,7 +77,6 @@ func main() {
 	if err := m.Up(); err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
 			fmt.Println("no migrations to apply")
-
 			return
 		}
 

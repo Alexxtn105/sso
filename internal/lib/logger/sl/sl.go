@@ -1,3 +1,4 @@
+// internal/lib/logger/sl/sl.go
 package sl
 
 import "log/slog"

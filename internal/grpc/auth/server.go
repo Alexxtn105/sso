@@ -1,3 +1,4 @@
+// internal/grpc/auth/server.go
 package auth
 
 import (

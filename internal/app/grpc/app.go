@@ -1,7 +1,10 @@
+// internal/app/grpc/app.go
+
 // отдельное приложение (internal/app/grpc) для gRPC-сервера вместе со всеми зависимостями
 package grpcapp
 
 import (
+	//"context"
 	"log/slog"
 
 	"google.golang.org/grpc"

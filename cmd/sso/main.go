@@ -1,3 +1,4 @@
+// `cmd/sso/main.go`
 package main
 
 import (
