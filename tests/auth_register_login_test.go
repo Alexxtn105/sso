@@ -6,6 +6,34 @@ package tests
 // Для ее установки:
 // go get github.com/brianvoe/gofakeit/v6@v6.23.2
 
+// ЛИКБЕЗ по пакету "github.com/stretchr/testify" (взято с https://habr.com/ru/companies/joom/articles/666440/)
+// В testify есть два основных пакета с проверками — assert и require.
+// Набор проверок в них идентичен, но фейл require-проверки означает прерывание выполнения теста, а assert-проверки — нет.
+// Когда мы пишем тест, мы хотим, чтобы неудачный запуск выдал нам как можно больше информации о текущем (неправильном) поведении программы.
+// Но если у нас есть череда проверок с require, неудачный запуск сообщит нам только о первом несоответствии.
+// Поэтому имеет смысл пользоваться require-проверками только если дальнейшее выполнение теста в случае невыполнения условия лишено смысла.
+// Например, когда мы проверяем отсутствие ошибки, или валидируем длину списка, в который полезем дальше по коду теста.
+// Используйте подходящие проверки:
+// ❌	require.Nil(t, err)
+// ✅	require.NoError(t, err)
+
+// ❌	assert.Equal(t, 300.0, float64(price.Amount))
+// ✅	assert.EqualValues(t, 300.0, price.Amount)
+
+// ❌	assert.Equal(t, 0, len(result.Errors))
+// ✅	assert.Empty(t, result.Errors)
+
+// ❌	require.Equal(t, len(expected), len(result)
+// 	     sort.Slice(expected, ...)
+// 	     sort.Slice(result, ...)
+// 	     for i := range result {
+// 		     assert.Equal(t, expected[i], result[i])
+// 	     }
+// ✅	assert.ElementsMatch(t, expected, result)
+//
+// Аналогично, тест по умолчанию считается упавшим в случае паники,
+// но использование assert.NotPanics() помогает будущему читателю теста понять, что вы проверяете именно её отсутствие.
+
 import (
 	"grpc-service-ref/tests/suite"
 	"testing"
@@ -99,3 +127,39 @@ func TestRegisterLogin_Login_HappyPath(t *testing.T) {
 func randomFakePassword() string {
 	return gofakeit.Password(true, true, true, true, false, passDefaultLen)
 }
+
+// Что пользователь может сделать не так?
+// Например, он может попытаться зарегистрироваться несколько раз с одинаковым логином.
+// Наше приложение не должно такое позволять, и должно отвечать правильной ошибкой.
+// И уж тем более, оно не должно падать с паникой, например.
+// Тест может выглядеть, например, так:
+func TestRegisterLogin_DuplicatedRegistration(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	email := gofakeit.Email()
+	pass := randomFakePassword()
+
+	//первая попытка должна быть успешной
+	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: pass,
+	})
+
+	require.NoError(t, err)                  // ошибки быть не должно
+	require.NotEmpty(t, respReg.GetUserId()) // UserID должен быть не пустым
+
+	// Вторая попытка - должен быть фейл
+	respReg, err = st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: pass,
+	})
+
+	require.Error(t, err)                               //должна быть ошибка
+	assert.Empty(t, respReg.GetUserId())                //user_id должен быть пуст
+	assert.ErrorContains(t, err, "user already exists") //текст ошибки должен содержать
+}
+
+// Также пользователь может присылать неверные данные на вход.
+// Вариаций подобных кейсов довольно много, а проверки примерно одинаковые,
+// поэтому мы напишем табличные тесты (если не знакомы с ними, очень советую ознакомиться).
+// Начнём с регистрации:
