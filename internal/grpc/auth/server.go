@@ -7,7 +7,7 @@ import (
 	"grpc-service-ref/internal/services/auth"
 	"grpc-service-ref/internal/storage"
 
-	// Подключаем сгенерированный код
+	// Подключаем сгенерированный код (имя ssov1 взято из контракта)
 	ssov1 "github.com/Alexxtn105/protos/gen/go/sso"
 
 	"google.golang.org/grpc"
@@ -15,17 +15,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// serverAPI Эта структура (ssov1.UnimplementedAuthServer) представляет собой некую пустую имплементацию всех методов gRPC сервиса.
+// Использование этой структуры помогает обеспечить обратную совместимость при изменении .proto файла.
+// Если мы добавим новый метод в наш .proto файл и заново сгенерируем код, но не реализуем этот метод в serverAPI,
+// то благодаря встраиванию UnimplementedAuthServer наш код все равно будет компилироваться,
+// а новый метод просто вернет ошибку "Not implemented".
 type serverAPI struct {
-	//Эта структура (ssov1.UnimplementedAuthServer) представляет собой некую пустую имплементацию всех методов gRPC сервиса.
-	//Использование этой структуры помогает обеспечить обратную совместимость при изменении .proto файла.
-	//Если мы добавим новый метод в наш .proto файл и заново сгенерируем код, но не реализуем этот метод в serverAPI,
-	//то благодаря встраиванию UnimplementedAuthServer наш код все равно будет компилироваться,
-	//а новый метод просто вернет ошибку "Not implemented".
 	ssov1.UnimplementedAuthServer
 	auth Auth
 }
 
-// Тот самый интерфейс, котрый мы передавали в grpcApp
+// Интерфейс, котрый мы передавали в grpcApp
 type Auth interface {
 	Login(
 		ctx context.Context,
@@ -49,19 +49,19 @@ func Register(gRPCServer *grpc.Server, auth Auth) {
 }
 
 // RPC-метод логина
+// Обратите внимание, что возвращаемую ошибку
+// мы создаем с помощью специальной функции status.Error
+// из библиотеки grpc/status.
+// Это нужно для того, чтобы формат ошибки был понятен любому grpc-клиенту.
+// Кроме того, мы присваиваем этой ошибке код из пакета grpc/codes —
+// это тоже необходимо для совместимости с клиентами.
+// К примеру, если не подошел пароль или мы не нашли пользователя в БД, это — codes.InvalidArgument,
+// если же БД вернула неожиданную ошибку, это уже codes.Internal.
 func (s *serverAPI) Login(
 	ctx context.Context,
 	in *ssov1.LoginRequest,
 ) (*ssov1.LoginResponse, error) {
 
-	//Обратите внимание, что возвращаемую ошибку
-	//мы создаем с помощью специальной функции status.Error
-	//из библиотеки grpc/status.
-	//Это нужно для того, чтобы формат ошибки был понятен любому grpc-клиенту.
-	//Кроме того, мы присваиваем этой ошибке код из пакета grpc/codes —
-	//это тоже необходимо для совместимости с клиентами.
-	//К примеру, если не подошел пароль или мы не нашли пользователя в БД, это — codes.InvalidArgument,
-	//если же БД вернула неожиданную ошибку, это уже codes.Internal.
 	if in.Email == "" {
 		return nil, status.Error(codes.InvalidArgument, "email is required")
 	}
