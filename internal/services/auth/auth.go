@@ -183,7 +183,7 @@ func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 		return false, fmt.Errorf("%s: %w", op, err)
 	}
 
-	log.Info("checked user is admin", slog.Bool("is_admin", isAdmin))
+	log.Info("checked if user is admin", slog.Bool("is_admin", isAdmin))
 
 	return isAdmin, nil
 }
