@@ -139,7 +139,7 @@ func (s *Storage) Close() error {
 func (s *Storage) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 	const op = "storage.sqlite.IsAdmin"
 
-	stmt, err := s.db.Prepare("SELECT is_admin FROM users WHERE id= &")
+	stmt, err := s.db.Prepare("SELECT is_admin FROM users WHERE id= ?")
 
 	if err != nil {
 		return false, fmt.Errorf("%s: %w", op, err)
