@@ -33,11 +33,14 @@ type Auth interface {
 		password string,
 		appID int,
 	) (token string, err error)
+
 	RegisterNewUser(
 		ctx context.Context,
 		email string,
 		password string,
 	) (userID int64, err error)
+
+	IsAdmin(ctx context.Context, userID int64) (bool, error)
 }
 
 // регистрация serverAPI в gRPC-сервере
@@ -109,3 +112,26 @@ func (s *serverAPI) Register(
 
 	return &ssov1.RegisterResponse{UserId: uid}, nil
 }
+
+// RPC-метод получения статуса администратора по ИД пользователя
+func (s *serverAPI) IsAdmin(
+	ctx context.Context,
+	in *ssov1.IsAdminRequest,
+) (*ssov1.IsAdminResponse, error) {
+	if in.UserId == 0 {
+		return nil, status.Error(codes.InvalidArgument, "user_id is required")
+	}
+
+	isAdmin, err := s.auth.IsAdmin(ctx, in.GetUserId())
+	if err != nil {
+		if errors.Is(err, storage.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+
+		return nil, status.Error(codes.Internal, "failed to check admin status")
+	}
+
+	return &ssov1.IsAdminResponse{IsAdmin: isAdmin}, nil
+}
+
+// TODO: сделать "ручку" для изменения статуса администратора

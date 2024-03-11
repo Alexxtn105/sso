@@ -75,10 +75,10 @@ func New(t *testing.T) (context.Context, *Suite) {
 		t.Fatalf("grpc server connection failed: %v", err)
 	}
 
-	//И вот тут мы можем снова прочувствовать крутость кодогенерации из Protobuf:
+	// И вот тут мы можем снова прочувствовать крутость кодогенерации из Protobuf:
 	// всего одной строчкой мы создаём готовый клиент для нашего gRPC-сервера:
 	authClient := ssov1.NewAuthClient(cc)
-	//Методами этого клиенту будут методы сервиса, описанные в контракте, т.е.:
+	// Методами этого клиента будут методы сервиса, описанные в контракте, т.е.:
 	// authClient.Login() и authClient.Register()
 
 	return ctx, &Suite{

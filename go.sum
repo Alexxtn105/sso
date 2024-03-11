@@ -1,5 +1,7 @@
 github.com/Alexxtn105/protos v0.0.0-20240225145233-c43e61ee55b4 h1:zZv5D9B9/ILH0PEFs29/sdbCGW0taRe9PJNQ0rkdmFA=
 github.com/Alexxtn105/protos v0.0.0-20240225145233-c43e61ee55b4/go.mod h1:NWkV3gbyaO/ofjGPe8glK5RvGsitrHcDASVtmEJVjjQ=
+github.com/Alexxtn105/protos v0.0.0-20240309122918-6b56226caa44 h1:mEbO9M0aAQDFtslqZ1XcEZFTDLTYoKKQR1JpFn8hIdw=
+github.com/Alexxtn105/protos v0.0.0-20240309122918-6b56226caa44/go.mod h1:NWkV3gbyaO/ofjGPe8glK5RvGsitrHcDASVtmEJVjjQ=
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/brianvoe/gofakeit/v6 v6.23.2 h1:lVde18uhad5wII/f5RMVFLtdQNE0HaGFuBUXmYKk8i8=

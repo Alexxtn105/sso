@@ -20,3 +20,7 @@ sso
 ├── migrations....... Миграции для базы данных
 ├── storage.......... Файлы хранилища, например SQLite базы данных
 └── tests............ Функциональные тесты
+
+ЗАПУСК МИГРАТОРА:
+
+go run ./cmd/migrator --storage-path=./storage/sso.db --migrations-path=./migrations
