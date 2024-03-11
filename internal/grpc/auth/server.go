@@ -25,7 +25,7 @@ type serverAPI struct {
 	auth Auth
 }
 
-// Интерфейс, котрый мы передавали в grpcApp
+// Интерфейс, который мы передавали в grpcApp
 type Auth interface {
 	Login(
 		ctx context.Context,
@@ -59,22 +59,29 @@ func Register(gRPCServer *grpc.Server, auth Auth) {
 // если же БД вернула неожиданную ошибку, это уже codes.Internal.
 func (s *serverAPI) Login(
 	ctx context.Context,
-	in *ssov1.LoginRequest,
+	req *ssov1.LoginRequest,
 ) (*ssov1.LoginResponse, error) {
 
-	if in.Email == "" {
-		return nil, status.Error(codes.InvalidArgument, "email is required")
+	// Вынес в validateLogin
+	/*
+		if req.Email == "" {
+			return nil, status.Error(codes.InvalidArgument, "email is required")
+		}
+
+		if req.Password == "" {
+			return nil, status.Error(codes.InvalidArgument, "password is required")
+		}
+
+		if req.GetAppId() == 0 {
+			return nil, status.Error(codes.InvalidArgument, "app_id is required")
+		}
+	*/
+	err := validateLogin(req)
+	if err != nil {
+		return nil, err
 	}
 
-	if in.Password == "" {
-		return nil, status.Error(codes.InvalidArgument, "password is required")
-	}
-
-	if in.GetAppId() == 0 {
-		return nil, status.Error(codes.InvalidArgument, "app_id is required")
-	}
-
-	token, err := s.auth.Login(ctx, in.GetEmail(), in.GetPassword(), int(in.GetAppId()))
+	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
 	if err != nil {
 		// Ошибку auth.ErrInvalidCredentials мы создадим ниже
 		if errors.Is(err, auth.ErrInvalidCredentials) {
@@ -90,17 +97,17 @@ func (s *serverAPI) Login(
 // RPC-метод регистрации
 func (s *serverAPI) Register(
 	ctx context.Context,
-	in *ssov1.RegisterRequest,
+	req *ssov1.RegisterRequest,
 ) (*ssov1.RegisterResponse, error) {
-	if in.Email == "" {
+	if req.Email == "" {
 		return nil, status.Error(codes.InvalidArgument, "email is required")
 	}
 
-	if in.Password == "" {
+	if req.Password == "" {
 		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
 
-	uid, err := s.auth.RegisterNewUser(ctx, in.GetEmail(), in.GetPassword())
+	uid, err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
 		// Ошибку storage.ErrUserExists мы создадим ниже
 		if errors.Is(err, storage.ErrUserExists) {
@@ -116,13 +123,13 @@ func (s *serverAPI) Register(
 // RPC-метод получения статуса администратора по ИД пользователя
 func (s *serverAPI) IsAdmin(
 	ctx context.Context,
-	in *ssov1.IsAdminRequest,
+	req *ssov1.IsAdminRequest,
 ) (*ssov1.IsAdminResponse, error) {
-	if in.UserId == 0 {
+	if req.UserId == 0 {
 		return nil, status.Error(codes.InvalidArgument, "user_id is required")
 	}
 
-	isAdmin, err := s.auth.IsAdmin(ctx, in.GetUserId())
+	isAdmin, err := s.auth.IsAdmin(ctx, req.GetUserId())
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -132,6 +139,32 @@ func (s *serverAPI) IsAdmin(
 	}
 
 	return &ssov1.IsAdminResponse{IsAdmin: isAdmin}, nil
+}
+
+func validateRegister(req *ssov1.RegisterRequest) error {
+
+	return nil
+}
+
+func validateLogin(req *ssov1.LoginRequest) error {
+	if req.GetEmail() == "" {
+		return status.Error(codes.InvalidArgument, "email is required")
+	}
+
+	if req.GetPassword() == "" {
+		return status.Error(codes.InvalidArgument, "password is required")
+	}
+
+	if req.GetAppId() == 0 {
+		return status.Error(codes.InvalidArgument, "app_id is required")
+	}
+
+	return nil
+}
+
+func validateIsAdmin(req *ssov1.IsAdminRequest) error {
+
+	return nil
 }
 
 // TODO: сделать "ручку" для изменения статуса администратора

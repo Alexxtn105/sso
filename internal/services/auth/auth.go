@@ -28,7 +28,7 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
-// Интерфейс сохранения пользователя
+// UserSaver Интерфейс сохранения пользователя
 type UserSaver interface {
 	SaveUser(
 		ctx context.Context,
@@ -37,18 +37,19 @@ type UserSaver interface {
 	) (uid int64, err error)
 }
 
-// Интерфейс получения пользователя
+// UserProvider Интерфейс получения пользователя
 type UserProvider interface {
 	User(ctx context.Context, email string) (models.User, error)
 
 	IsAdmin(ctx context.Context, userID int64) (bool, error)
 }
 
-// интерфейс для получения App (приложения) из хранилища
+// AppProvider интерфейс для получения App (приложения) из хранилища
 type AppProvider interface {
 	App(ctx context.Context, appID int) (models.App, error)
 }
 
+// Auth структура сервиса авторизации
 type Auth struct {
 	log         *slog.Logger
 	usrSaver    UserSaver
@@ -57,6 +58,7 @@ type Auth struct {
 	tokenTTL    time.Duration
 }
 
+// New returns a new instane of Auth service
 func New(
 	log *slog.Logger,
 	userSaver UserSaver,
@@ -73,6 +75,7 @@ func New(
 	}
 }
 
+// RegisterNewUser Регистрация нового пользователя
 func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (int64, error) {
 	// op (operation) - имя текущей функции и пакета. Такую метку удобно
 	// добавлять в логи и в текст ошибок, чтобы легче было искать хвосты
@@ -165,6 +168,7 @@ func (a *Auth) Login(
 
 }
 
+// IsAdmin checks if user is Admin
 func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 	const op = "Auth.IsAdmin"
 	log := a.log.With(
