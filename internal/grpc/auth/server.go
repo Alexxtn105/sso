@@ -1,4 +1,3 @@
-// internal/grpc/auth/server.go
 package auth
 
 import (
@@ -25,7 +24,7 @@ type serverAPI struct {
 	auth Auth
 }
 
-// Интерфейс, который мы передавали в grpcApp
+// Auth Интерфейс, который мы передавали в grpcApp
 type Auth interface {
 	Login(
 		ctx context.Context,
@@ -43,12 +42,12 @@ type Auth interface {
 	IsAdmin(ctx context.Context, userID int64) (bool, error)
 }
 
-// регистрация serverAPI в gRPC-сервере
+// Register регистрация serverAPI в gRPC-сервере
 func Register(gRPCServer *grpc.Server, auth Auth) {
 	ssov1.RegisterAuthServer(gRPCServer, &serverAPI{auth: auth})
 }
 
-// RPC-метод логина
+// Login RPC-метод логина
 // Обратите внимание, что возвращаемую ошибку
 // мы создаем с помощью специальной функции status.Error
 // из библиотеки grpc/status.
@@ -62,24 +61,24 @@ func (s *serverAPI) Login(
 	req *ssov1.LoginRequest,
 ) (*ssov1.LoginResponse, error) {
 
-	// Вынес в validateLogin
-	/*
-		if req.Email == "" {
-			return nil, status.Error(codes.InvalidArgument, "email is required")
-		}
+	// проверки можно вынести в validateLogin
 
-		if req.Password == "" {
-			return nil, status.Error(codes.InvalidArgument, "password is required")
-		}
-
-		if req.GetAppId() == 0 {
-			return nil, status.Error(codes.InvalidArgument, "app_id is required")
-		}
-	*/
-	err := validateLogin(req)
-	if err != nil {
-		return nil, err
+	if req.Email == "" {
+		return nil, status.Error(codes.InvalidArgument, "email is required")
 	}
+
+	if req.Password == "" {
+		return nil, status.Error(codes.InvalidArgument, "password is required")
+	}
+
+	if req.GetAppId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "app_id is required")
+	}
+
+	//err := validateLogin(req)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
 	if err != nil {
@@ -94,7 +93,7 @@ func (s *serverAPI) Login(
 	return &ssov1.LoginResponse{Token: token}, nil
 }
 
-// RPC-метод регистрации
+// Register RPC-метод регистрации
 func (s *serverAPI) Register(
 	ctx context.Context,
 	req *ssov1.RegisterRequest,
@@ -120,7 +119,7 @@ func (s *serverAPI) Register(
 	return &ssov1.RegisterResponse{UserId: uid}, nil
 }
 
-// RPC-метод получения статуса администратора по ИД пользователя
+// IsAdmin RPC-метод получения статуса администратора по ИД пользователя
 func (s *serverAPI) IsAdmin(
 	ctx context.Context,
 	req *ssov1.IsAdminRequest,
@@ -141,11 +140,13 @@ func (s *serverAPI) IsAdmin(
 	return &ssov1.IsAdminResponse{IsAdmin: isAdmin}, nil
 }
 
+/*
 func validateRegister(req *ssov1.RegisterRequest) error {
 
-	return nil
-}
-
+		return nil
+	}
+*/
+/*
 func validateLogin(req *ssov1.LoginRequest) error {
 	if req.GetEmail() == "" {
 		return status.Error(codes.InvalidArgument, "email is required")
@@ -162,9 +163,12 @@ func validateLogin(req *ssov1.LoginRequest) error {
 	return nil
 }
 
+*/
+
+/*
 func validateIsAdmin(req *ssov1.IsAdminRequest) error {
 
 	return nil
 }
-
+*/
 // TODO: сделать "ручку" для изменения статуса администратора
