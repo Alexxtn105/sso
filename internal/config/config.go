@@ -3,6 +3,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"time"
 
@@ -75,6 +76,9 @@ func fetchConfigPath() string {
 
 	if res == "" {
 		res = os.Getenv("CONFIG_PATH")
+		fmt.Println("Конфигурация из переменной окружения")
+	} else {
+		fmt.Println("Конфигурация из параметра командной строки")
 	}
 
 	return res

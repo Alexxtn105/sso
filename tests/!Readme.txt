@@ -28,7 +28,7 @@ go run ./cmd/migrator --storage-path=./storage/sso.db --migrations-path=./tests/
 ---------------------------------------------------------
 Запуск тестов
 
-Если у вас свежая чистая БД, то первым делом прогоняем основные миграци:
+Если у вас свежая чистая БД, то первым делом прогоняем основные миграции:
 go run ./cmd/migrator --storage-path=./storage/sso.db --migrations-path=./migrations
 
 Затем тестовые миграции:

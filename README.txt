@@ -24,3 +24,9 @@ sso
 ЗАПУСК МИГРАТОРА:
 
 go run ./cmd/migrator --storage-path=./storage/sso.db --migrations-path=./migrations
+
+
+Запуск сервера (с локальной конфигурацией):
+go run ./cmd/sso --config=./config/config_local.yaml
+
+С переменной окружения CONFIG_PATH:
